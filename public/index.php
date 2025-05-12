@@ -45,6 +45,11 @@ if ($config['app']['debug']) {
 // Remove base path from request
 $request = substr($request, strlen($basePath));
 
+// Ensure request starts with a slash
+if (strlen($request) > 0 && $request[0] !== '/') {
+    $request = '/' . $request;
+}
+
 // Debug information
 if ($config['app']['debug']) {
     error_log("Processed Request: " . $request);
