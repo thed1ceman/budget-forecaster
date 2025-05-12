@@ -51,6 +51,9 @@ switch ($request) {
     case '/dashboard':
         require __DIR__ . '/../src/views/dashboard.php';
         break;
+    case '/logout':
+        require __DIR__ . '/api/auth/logout.php';
+        break;
     default:
         http_response_code(404);
         require __DIR__ . '/../src/views/404.php';
