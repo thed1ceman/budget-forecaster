@@ -14,6 +14,19 @@ ALTER TABLE payments
 -- Update audit_log table
 ALTER TABLE audit_log
     MODIFY COLUMN action VARCHAR(50) NOT NULL,
-    MODIFY COLUMN ip_address VARCHAR(45) NOT NULL,
-    DROP FOREIGN KEY IF EXISTS audit_log_ibfk_1,
-    ADD CONSTRAINT audit_log_ibfk_1 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE; 
+    MODIFY COLUMN ip_address VARCHAR(45) NOT NULL;
+
+-- Handle foreign key constraints separately
+SET FOREIGN_KEY_CHECKS=0;
+
+-- Drop existing foreign key if it exists
+ALTER TABLE audit_log
+    DROP FOREIGN KEY IF EXISTS audit_log_ibfk_1;
+
+-- Add new foreign key
+ALTER TABLE audit_log
+    ADD CONSTRAINT audit_log_ibfk_1 
+    FOREIGN KEY (user_id) REFERENCES users(id) 
+    ON DELETE CASCADE;
+
+SET FOREIGN_KEY_CHECKS=1; 
