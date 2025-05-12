@@ -128,8 +128,11 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         }
         .calendar-day-content {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
         }
         .calendar-day:hover {
             background: #f8f9fa;
@@ -158,6 +161,34 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             right: 2px;
             font-size: 0.8em;
         }
+        .balance-indicator {
+            background: #e3f2fd;
+            color: #0d6efd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+        }
+        .payment-indicator {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .payment-amount {
+            font-weight: bold;
+        }
+        .calendar-day.today .balance-indicator {
+            background: #0d6efd;
+            color: white;
+        }
         @media (max-width: 768px) {
             .calendar-weekday {
                 font-size: 0.8rem;
@@ -166,6 +197,12 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             .calendar-day {
                 font-size: 0.8rem;
                 min-height: 50px;
+            }
+            .calendar-day-content {
+                font-size: 0.7rem;
+            }
+            .balance-indicator, .payment-indicator {
+                padding: 0.15rem 0.25rem;
             }
         }
     </style>
@@ -275,11 +312,23 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                 </div>
                                 <div class="calendar-days">
                                     <?php
+                                    // Get all payments for the current month
                                     $firstDay = new DateTime(date('Y-m-01'));
                                     $lastDay = new DateTime(date('Y-m-t'));
                                     $today = new DateTime();
                                     $currentDay = clone $firstDay;
                                     $currentDay->modify('-' . $firstDay->format('w') . ' days');
+
+                                    // Create a map of payments by date
+                                    $paymentsByDate = [];
+                                    foreach ($payments as $payment) {
+                                        $dueDate = new DateTime($payment['due_date']);
+                                        $dateKey = $dueDate->format('Y-m-d');
+                                        if (!isset($paymentsByDate[$dateKey])) {
+                                            $paymentsByDate[$dateKey] = [];
+                                        }
+                                        $paymentsByDate[$dateKey][] = $payment;
+                                    }
 
                                     while ($currentDay <= $lastDay) {
                                         $isCurrentMonth = $currentDay->format('m') === $firstDay->format('m');
@@ -293,7 +342,36 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                         
                                         echo "<div class='" . implode(' ', $classes) . "'>";
                                         echo "<div class='calendar-day-number'>" . $currentDay->format('j') . "</div>";
-                                        echo "<div class='calendar-day-content'></div>";
+                                        echo "<div class='calendar-day-content'>";
+                                        
+                                        // Show balance on today's date
+                                        if ($isToday) {
+                                            $symbol = '';
+                                            switch($settings['currency']) {
+                                                case 'USD': $symbol = '$'; break;
+                                                case 'EUR': $symbol = '€'; break;
+                                                default: $symbol = '£';
+                                            }
+                                            echo "<div class='balance-indicator'>" . $symbol . number_format($settings['current_balance'], 2) . "</div>";
+                                        }
+                                        
+                                        // Show payments for this date
+                                        $dateKey = $currentDay->format('Y-m-d');
+                                        if (isset($paymentsByDate[$dateKey])) {
+                                            foreach ($paymentsByDate[$dateKey] as $payment) {
+                                                $symbol = '';
+                                                switch($settings['currency']) {
+                                                    case 'USD': $symbol = '$'; break;
+                                                    case 'EUR': $symbol = '€'; break;
+                                                    default: $symbol = '£';
+                                                }
+                                                echo "<div class='payment-indicator' title='" . htmlspecialchars($payment['name']) . "'>" . 
+                                                     htmlspecialchars($payment['name']) . " <span class='payment-amount'>" . 
+                                                     $symbol . number_format($payment['amount'], 2) . "</span></div>";
+                                            }
+                                        }
+                                        
+                                        echo "</div>";
                                         if ($isPayday) echo "<span class='payday-indicator'>💰</span>";
                                         echo "</div>";
                                         
