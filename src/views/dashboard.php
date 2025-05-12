@@ -120,6 +120,8 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             color: #495057;
             transition: all 0.2s ease;
             min-height: 60px;
+            width: 100%;
+            box-sizing: border-box;
         }
         .calendar-day-number {
             text-align: left;
@@ -134,12 +136,14 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             gap: 0.25rem;
             font-size: 0.8rem;
             height: 100%;
+            overflow: hidden;
         }
         .calendar-day-events {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
             width: 100%;
+            overflow: hidden;
         }
         .calendar-day-footer {
             margin-top: auto;
@@ -192,6 +196,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            box-sizing: border-box;
         }
         .payment-amount {
             font-weight: bold;
@@ -328,7 +333,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                             <div class="calendar-grid">
                                 <div class="calendar-weekdays">
                                     <?php
-                                    $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                    $weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                                     foreach ($weekdays as $day) {
                                         echo "<div class='calendar-weekday'>$day</div>";
                                     }
@@ -340,8 +345,11 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                     $firstDay = new DateTime(date('Y-m-01'));
                                     $lastDay = new DateTime(date('Y-m-t'));
                                     $today = new DateTime();
+                                    
+                                    // Adjust first day to Monday (1) instead of Sunday (0)
+                                    $firstDayOfWeek = $firstDay->format('N'); // 1 (Monday) to 7 (Sunday)
                                     $currentDay = clone $firstDay;
-                                    $currentDay->modify('-' . $firstDay->format('w') . ' days');
+                                    $currentDay->modify('-' . ($firstDayOfWeek - 1) . ' days');
 
                                     // Create a map of payments by date
                                     $paymentsByDate = [];
@@ -388,6 +396,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                         $currentDate->modify('+1 day');
                                     }
 
+                                    // Display calendar days
                                     while ($currentDay <= $lastDay) {
                                         $isCurrentMonth = $currentDay->format('m') === $firstDay->format('m');
                                         $isToday = $currentDay->format('Y-m-d') === $today->format('Y-m-d');
