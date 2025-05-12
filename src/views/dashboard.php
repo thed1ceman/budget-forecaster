@@ -189,6 +189,16 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             background: #0d6efd;
             color: white;
         }
+        .running-balance {
+            color: #6c757d;
+            font-size: 0.75rem;
+            text-align: center;
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        .calendar-day.today .running-balance {
+            display: none; /* Hide running balance on today since we show the actual balance */
+        }
         @media (max-width: 768px) {
             .calendar-weekday {
                 font-size: 0.8rem;
@@ -330,10 +340,45 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                         $paymentsByDate[$dateKey][] = $payment;
                                     }
 
+                                    // Calculate running balance for each day
+                                    $runningBalance = $settings['current_balance'];
+                                    $balanceByDate = [];
+                                    $currentDate = clone $today;
+                                    $lastDayOfMonth = clone $lastDay;
+                                    
+                                    // First, get all payments for the current month
+                                    $monthPayments = [];
+                                    foreach ($payments as $payment) {
+                                        $dueDate = new DateTime($payment['due_date']);
+                                        if ($dueDate >= $today && $dueDate <= $lastDayOfMonth) {
+                                            $dateKey = $dueDate->format('Y-m-d');
+                                            if (!isset($monthPayments[$dateKey])) {
+                                                $monthPayments[$dateKey] = [];
+                                            }
+                                            $monthPayments[$dateKey][] = $payment;
+                                        }
+                                    }
+                                    
+                                    // Calculate running balance for each day
+                                    while ($currentDate <= $lastDayOfMonth) {
+                                        $dateKey = $currentDate->format('Y-m-d');
+                                        $balanceByDate[$dateKey] = $runningBalance;
+                                        
+                                        // Subtract any payments due on this day
+                                        if (isset($monthPayments[$dateKey])) {
+                                            foreach ($monthPayments[$dateKey] as $payment) {
+                                                $runningBalance -= $payment['amount'];
+                                            }
+                                        }
+                                        
+                                        $currentDate->modify('+1 day');
+                                    }
+
                                     while ($currentDay <= $lastDay) {
                                         $isCurrentMonth = $currentDay->format('m') === $firstDay->format('m');
                                         $isToday = $currentDay->format('Y-m-d') === $today->format('Y-m-d');
                                         $isPayday = $isCurrentMonth && $currentDay->format('d') == $settings['payday'];
+                                        $isFuture = $currentDay > $today;
                                         
                                         $classes = ['calendar-day'];
                                         if (!$isCurrentMonth) $classes[] = 'text-muted';
@@ -353,6 +398,20 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                                 default: $symbol = '£';
                                             }
                                             echo "<div class='balance-indicator'>" . $symbol . number_format($settings['current_balance'], 2) . "</div>";
+                                        }
+                                        
+                                        // Show running balance for future dates
+                                        if ($isFuture && $isCurrentMonth) {
+                                            $dateKey = $currentDay->format('Y-m-d');
+                                            if (isset($balanceByDate[$dateKey])) {
+                                                $symbol = '';
+                                                switch($settings['currency']) {
+                                                    case 'USD': $symbol = '$'; break;
+                                                    case 'EUR': $symbol = '€'; break;
+                                                    default: $symbol = '£';
+                                                }
+                                                echo "<div class='running-balance'>" . $symbol . number_format($balanceByDate[$dateKey], 2) . "</div>";
+                                            }
                                         }
                                         
                                         // Show payments for this date
