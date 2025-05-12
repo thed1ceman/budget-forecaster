@@ -68,6 +68,93 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
     <title>Dashboard - <?php echo htmlspecialchars($config['app']['name']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
+    <style>
+        .calendar {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .calendar-header {
+            margin-bottom: 1rem;
+        }
+        .calendar-header h4 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .calendar-grid {
+            display: grid;
+            gap: 1px;
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .calendar-weekday {
+            padding: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e9ecef;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 0.5rem;
+            position: relative;
+            font-size: 0.9rem;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        .calendar-day:hover {
+            background: #f8f9fa;
+        }
+        .calendar-day.text-muted {
+            color: #adb5bd;
+            background: #f8f9fa;
+        }
+        .calendar-day.today {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .calendar-day.payday {
+            background-color: #e8f5e9;
+            color: #198754;
+            font-weight: bold;
+        }
+        .payday-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 0.8em;
+        }
+        @media (max-width: 768px) {
+            .calendar-weekday {
+                font-size: 0.8rem;
+                padding: 0.25rem;
+            }
+            .calendar-day {
+                font-size: 0.8rem;
+                padding: 0.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
