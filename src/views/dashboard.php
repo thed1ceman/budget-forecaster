@@ -87,6 +87,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         .calendar-header h4 {
             margin: 0;
             color: #2c3e50;
+            font-size: 1.25rem;
         }
         .calendar-grid {
             display: grid;
@@ -133,6 +134,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             text-align: left;
             padding: 0.25rem;
             font-weight: 500;
+            font-size: 0.9rem;
         }
         .calendar-day-content {
             display: flex;
@@ -190,6 +192,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             font-weight: 500;
             text-align: center;
             width: 100%;
+            font-size: 0.8rem;
         }
         .payment-indicator {
             background: #fff3cd;
@@ -202,7 +205,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            box-sizing: border-box;
+            font-size: 0.75rem;
         }
         .payment-amount {
             font-weight: bold;
@@ -213,7 +216,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         }
         .running-balance {
             color: #6c757d;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-align: center;
             width: 100%;
             padding: 0.25rem 0;
@@ -223,21 +226,135 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         .calendar-day.today .running-balance {
             display: none;
         }
+
+        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-header {
+                padding: 0.75rem;
+            }
+            
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .calendar {
+                padding: 0.5rem;
+            }
+            
+            .calendar-header h4 {
+                font-size: 1.1rem;
+            }
+            
             .calendar-weekday {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
                 padding: 0.25rem;
             }
+            
             .calendar-day {
-                font-size: 0.8rem;
                 min-height: 50px;
+                padding: 0.15rem;
             }
+            
+            .calendar-day-number {
+                font-size: 0.8rem;
+                padding: 0.15rem;
+            }
+            
             .calendar-day-content {
                 font-size: 0.7rem;
             }
-            .running-balance {
+            
+            .balance-indicator {
+                font-size: 0.7rem;
+                padding: 0.15rem 0.25rem;
+            }
+            
+            .payment-indicator {
                 font-size: 0.65rem;
+                padding: 0.15rem 0.25rem;
+            }
+            
+            .running-balance {
+                font-size: 0.6rem;
                 padding: 0.15rem 0;
+            }
+            
+            .table {
+                font-size: 0.8rem;
+            }
+            
+            .table th, .table td {
+                padding: 0.5rem;
+            }
+            
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+            }
+            
+            .form-control {
+                font-size: 0.9rem;
+                padding: 0.375rem 0.5rem;
+            }
+            
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .modal-header {
+                padding: 0.75rem;
+            }
+            
+            .modal-body {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Small Mobile Devices */
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 40px;
+            }
+            
+            .calendar-day-number {
+                font-size: 0.7rem;
+            }
+            
+            .calendar-day-content {
+                font-size: 0.6rem;
+            }
+            
+            .balance-indicator {
+                font-size: 0.6rem;
+            }
+            
+            .payment-indicator {
+                font-size: 0.55rem;
+            }
+            
+            .running-balance {
+                font-size: 0.55rem;
+            }
+            
+            .table {
+                font-size: 0.7rem;
+            }
+            
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.7rem;
             }
         }
     </style>
