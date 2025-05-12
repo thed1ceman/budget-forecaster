@@ -54,20 +54,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-payment').forEach(button => {
         button.addEventListener('click', async function() {
             if (confirm('Are you sure you want to delete this payment?')) {
-                const paymentId = this.dataset.id;
+                const paymentId = this.dataset.paymentId;
+                const formData = new FormData();
+                formData.append('payment_id', paymentId);
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').content);
+
                 try {
-                    const response = await fetch(`/api/payments/${paymentId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-                        }
+                    const response = await fetch('/api/payments/delete.php', {
+                        method: 'POST',
+                        body: formData
                     });
 
                     if (response.ok) {
                         window.location.reload();
                     } else {
-                        const error = await response.json();
-                        alert(error.message || 'Failed to delete payment');
+                        const error = await response.text();
+                        alert(error || 'Failed to delete payment');
                     }
                 } catch (error) {
                     alert('An error occurred while deleting the payment');
