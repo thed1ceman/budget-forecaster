@@ -29,34 +29,31 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
-// Handle routing
+// Get the request URI and remove the base path
 $request = $_SERVER['REQUEST_URI'];
 $basePath = dirname($_SERVER['SCRIPT_NAME']);
-
-// Debug information
-if ($config['app']['debug']) {
-    error_log("=== Routing Debug ===");
-    error_log("Original Request URI: " . $request);
-    error_log("Script Name: " . $_SERVER['SCRIPT_NAME']);
-    error_log("Base Path: " . $basePath);
-    error_log("Document Root: " . $_SERVER['DOCUMENT_ROOT']);
+if (strpos($request, $basePath) === 0) {
+    $request = substr($request, strlen($basePath));
 }
 
-// Remove base path from request
-$request = substr($request, strlen($basePath));
+// Remove query string from request
+$request = parse_url($request, PHP_URL_PATH);
 
 // Ensure request starts with a slash
-if (strlen($request) > 0 && $request[0] !== '/') {
+if (strpos($request, '/') !== 0) {
     $request = '/' . $request;
 }
 
-// Debug information
+// Debug logging
 if ($config['app']['debug']) {
+    error_log("Request URI: " . $_SERVER['REQUEST_URI']);
+    error_log("Script Name: " . $_SERVER['SCRIPT_NAME']);
+    error_log("Base Path: " . $basePath);
+    error_log("Document Root: " . $_SERVER['DOCUMENT_ROOT']);
     error_log("Processed Request: " . $request);
-    error_log("===================");
 }
 
-// Simple router
+// Route the request
 switch ($request) {
     case '/':
     case '':
