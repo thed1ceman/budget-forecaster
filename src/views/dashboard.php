@@ -355,11 +355,33 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                     $paymentsByDate = [];
                                     foreach ($payments as $payment) {
                                         $dueDate = new DateTime($payment['due_date']);
-                                        $dateKey = $dueDate->format('Y-m-d');
-                                        if (!isset($paymentsByDate[$dateKey])) {
-                                            $paymentsByDate[$dateKey] = [];
+                                        
+                                        // For weekly payments, calculate all instances in the current month
+                                        if ($payment['frequency'] === 'weekly') {
+                                            $tempDate = clone $dueDate;
+                                            // Go back to the first occurrence in the current month
+                                            while ($tempDate > $firstDay) {
+                                                $tempDate->modify('-1 week');
+                                            }
+                                            // Add all weekly occurrences up to the end of the month
+                                            while ($tempDate <= $lastDay) {
+                                                if ($tempDate >= $firstDay) {
+                                                    $dateKey = $tempDate->format('Y-m-d');
+                                                    if (!isset($paymentsByDate[$dateKey])) {
+                                                        $paymentsByDate[$dateKey] = [];
+                                                    }
+                                                    $paymentsByDate[$dateKey][] = $payment;
+                                                }
+                                                $tempDate->modify('+1 week');
+                                            }
+                                        } else {
+                                            // For non-weekly payments, just add the single occurrence
+                                            $dateKey = $dueDate->format('Y-m-d');
+                                            if (!isset($paymentsByDate[$dateKey])) {
+                                                $paymentsByDate[$dateKey] = [];
+                                            }
+                                            $paymentsByDate[$dateKey][] = $payment;
                                         }
-                                        $paymentsByDate[$dateKey][] = $payment;
                                     }
 
                                     // Calculate running balance for each day
@@ -372,12 +394,34 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                     $monthPayments = [];
                                     foreach ($payments as $payment) {
                                         $dueDate = new DateTime($payment['due_date']);
-                                        if ($dueDate >= $today && $dueDate <= $lastDayOfMonth) {
-                                            $dateKey = $dueDate->format('Y-m-d');
-                                            if (!isset($monthPayments[$dateKey])) {
-                                                $monthPayments[$dateKey] = [];
+                                        
+                                        // For weekly payments, calculate all instances
+                                        if ($payment['frequency'] === 'weekly') {
+                                            $tempDate = clone $dueDate;
+                                            // Go back to the first occurrence in the current month
+                                            while ($tempDate > $firstDay) {
+                                                $tempDate->modify('-1 week');
                                             }
-                                            $monthPayments[$dateKey][] = $payment;
+                                            // Add all weekly occurrences up to the end of the month
+                                            while ($tempDate <= $lastDay) {
+                                                if ($tempDate >= $today) {
+                                                    $dateKey = $tempDate->format('Y-m-d');
+                                                    if (!isset($monthPayments[$dateKey])) {
+                                                        $monthPayments[$dateKey] = [];
+                                                    }
+                                                    $monthPayments[$dateKey][] = $payment;
+                                                }
+                                                $tempDate->modify('+1 week');
+                                            }
+                                        } else {
+                                            // For non-weekly payments, just add the single occurrence
+                                            if ($dueDate >= $today && $dueDate <= $lastDayOfMonth) {
+                                                $dateKey = $dueDate->format('Y-m-d');
+                                                if (!isset($monthPayments[$dateKey])) {
+                                                    $monthPayments[$dateKey] = [];
+                                                }
+                                                $monthPayments[$dateKey][] = $payment;
+                                            }
                                         }
                                     }
                                     
