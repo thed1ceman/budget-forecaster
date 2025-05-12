@@ -80,6 +80,20 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
     </nav>
 
     <div class="container mt-4">
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($_GET['success']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($_GET['error']); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <div class="row">
             <!-- Settings Section -->
             <div class="col-md-4">
@@ -144,8 +158,52 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                         </button>
                     </div>
                     <div class="card-body">
+                        <!-- Calendar -->
+                        <div class="calendar mb-4">
+                            <div class="calendar-header text-center mb-2">
+                                <h4><?php echo date('F Y'); ?></h4>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-weekdays">
+                                    <?php
+                                    $weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                    foreach ($weekdays as $day) {
+                                        echo "<div class='calendar-weekday'>$day</div>";
+                                    }
+                                    ?>
+                                </div>
+                                <div class="calendar-days">
+                                    <?php
+                                    $firstDay = new DateTime(date('Y-m-01'));
+                                    $lastDay = new DateTime(date('Y-m-t'));
+                                    $today = new DateTime();
+                                    $currentDay = clone $firstDay;
+                                    $currentDay->modify('-' . $firstDay->format('w') . ' days');
+
+                                    while ($currentDay <= $lastDay) {
+                                        $isCurrentMonth = $currentDay->format('m') === $firstDay->format('m');
+                                        $isToday = $currentDay->format('Y-m-d') === $today->format('Y-m-d');
+                                        $isPayday = $isCurrentMonth && $currentDay->format('d') == $settings['payday'];
+                                        
+                                        $classes = ['calendar-day'];
+                                        if (!$isCurrentMonth) $classes[] = 'text-muted';
+                                        if ($isToday) $classes[] = 'today';
+                                        if ($isPayday) $classes[] = 'payday';
+                                        
+                                        echo "<div class='" . implode(' ', $classes) . "'>";
+                                        echo $currentDay->format('j');
+                                        if ($isPayday) echo " <span class='payday-indicator'>💰</span>";
+                                        echo "</div>";
+                                        
+                                        $currentDay->modify('+1 day');
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+
                         <?php if (empty($payments)): ?>
-                            <p class="text-muted">No payments added yet.</p>
+                            <p class="text-muted">No payments added yet. Click "Add Payment" to get started.</p>
                         <?php else: ?>
                             <div class="table-responsive">
                                 <table class="table">
