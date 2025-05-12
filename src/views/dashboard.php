@@ -130,9 +130,20 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 0.25rem;
             font-size: 0.8rem;
+            height: 100%;
+        }
+        .calendar-day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            width: 100%;
+        }
+        .calendar-day-footer {
+            margin-top: auto;
+            width: 100%;
         }
         .calendar-day:hover {
             background: #f8f9fa;
@@ -194,10 +205,12 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             font-size: 0.75rem;
             text-align: center;
             width: 100%;
+            padding: 0.25rem 0;
+            border-top: 1px solid #dee2e6;
             margin-top: 0.25rem;
         }
         .calendar-day.today .running-balance {
-            display: none; /* Hide running balance on today since we show the actual balance */
+            display: none;
         }
         @media (max-width: 768px) {
             .calendar-weekday {
@@ -211,8 +224,9 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             .calendar-day-content {
                 font-size: 0.7rem;
             }
-            .balance-indicator, .payment-indicator {
-                padding: 0.15rem 0.25rem;
+            .running-balance {
+                font-size: 0.65rem;
+                padding: 0.15rem 0;
             }
         }
     </style>
@@ -388,6 +402,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                         echo "<div class='" . implode(' ', $classes) . "'>";
                                         echo "<div class='calendar-day-number'>" . $currentDay->format('j') . "</div>";
                                         echo "<div class='calendar-day-content'>";
+                                        echo "<div class='calendar-day-events'>";
                                         
                                         // Show balance on today's date
                                         if ($isToday) {
@@ -398,20 +413,6 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                                 default: $symbol = '£';
                                             }
                                             echo "<div class='balance-indicator'>" . $symbol . number_format($settings['current_balance'], 2) . "</div>";
-                                        }
-                                        
-                                        // Show running balance for future dates
-                                        if ($isFuture && $isCurrentMonth) {
-                                            $dateKey = $currentDay->format('Y-m-d');
-                                            if (isset($balanceByDate[$dateKey])) {
-                                                $symbol = '';
-                                                switch($settings['currency']) {
-                                                    case 'USD': $symbol = '$'; break;
-                                                    case 'EUR': $symbol = '€'; break;
-                                                    default: $symbol = '£';
-                                                }
-                                                echo "<div class='running-balance'>" . $symbol . number_format($balanceByDate[$dateKey], 2) . "</div>";
-                                            }
                                         }
                                         
                                         // Show payments for this date
@@ -430,7 +431,25 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                             }
                                         }
                                         
-                                        echo "</div>";
+                                        echo "</div>"; // Close calendar-day-events
+                                        
+                                        // Show running balance for future dates
+                                        if ($isFuture && $isCurrentMonth) {
+                                            $dateKey = $currentDay->format('Y-m-d');
+                                            if (isset($balanceByDate[$dateKey])) {
+                                                $symbol = '';
+                                                switch($settings['currency']) {
+                                                    case 'USD': $symbol = '$'; break;
+                                                    case 'EUR': $symbol = '€'; break;
+                                                    default: $symbol = '£';
+                                                }
+                                                echo "<div class='calendar-day-footer'>";
+                                                echo "<div class='running-balance'>" . $symbol . number_format($balanceByDate[$dateKey], 2) . "</div>";
+                                                echo "</div>";
+                                            }
+                                        }
+                                        
+                                        echo "</div>"; // Close calendar-day-content
                                         if ($isPayday) echo "<span class='payday-indicator'>💰</span>";
                                         echo "</div>";
                                         
