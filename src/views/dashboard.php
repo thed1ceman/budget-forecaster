@@ -47,10 +47,15 @@ while ($currentDate < $payday) {
 $upcomingPayments = [];
 $totalUpcoming = 0;
 foreach ($payments as $payment) {
-    $dueDate = new DateTime();
-    $dueDate->setDate($today->format('Y'), $today->format('m'), $payment['due_day']);
+    $dueDate = new DateTime($payment['due_date']);
     if ($dueDate < $today) {
-        $dueDate->modify('+1 month');
+        if ($payment['frequency'] === 'monthly') {
+            $dueDate->modify('+1 month');
+        } elseif ($payment['frequency'] === 'weekly') {
+            $dueDate->modify('+1 week');
+        } elseif ($payment['frequency'] === 'yearly') {
+            $dueDate->modify('+1 year');
+        }
     }
     if ($dueDate <= $payday) {
         $upcomingPayments[] = $payment;
@@ -65,6 +70,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo $_SESSION['csrf_token']; ?>">
     <title>Dashboard - <?php echo htmlspecialchars($config['app']['name']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/style.css" rel="stylesheet">
