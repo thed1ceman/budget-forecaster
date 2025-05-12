@@ -111,15 +111,25 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         }
         .calendar-day {
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-rows: auto 1fr;
             background: white;
-            padding: 0.5rem;
+            padding: 0.25rem;
             position: relative;
             font-size: 0.9rem;
             color: #495057;
             transition: all 0.2s ease;
+            min-height: 60px;
+        }
+        .calendar-day-number {
+            text-align: left;
+            padding: 0.25rem;
+            font-weight: 500;
+        }
+        .calendar-day-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .calendar-day:hover {
             background: #f8f9fa;
@@ -131,11 +141,15 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
         .calendar-day.today {
             background-color: #e3f2fd;
             color: #0d6efd;
+        }
+        .calendar-day.today .calendar-day-number {
             font-weight: bold;
         }
         .calendar-day.payday {
             background-color: #e8f5e9;
             color: #198754;
+        }
+        .calendar-day.payday .calendar-day-number {
             font-weight: bold;
         }
         .payday-indicator {
@@ -151,7 +165,7 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
             }
             .calendar-day {
                 font-size: 0.8rem;
-                padding: 0.25rem;
+                min-height: 50px;
             }
         }
     </style>
@@ -278,8 +292,9 @@ $remainingBalance = $settings['current_balance'] - $totalUpcoming;
                                         if ($isPayday) $classes[] = 'payday';
                                         
                                         echo "<div class='" . implode(' ', $classes) . "'>";
-                                        echo $currentDay->format('j');
-                                        if ($isPayday) echo " <span class='payday-indicator'>💰</span>";
+                                        echo "<div class='calendar-day-number'>" . $currentDay->format('j') . "</div>";
+                                        echo "<div class='calendar-day-content'></div>";
+                                        if ($isPayday) echo "<span class='payday-indicator'>💰</span>";
                                         echo "</div>";
                                         
                                         $currentDay->modify('+1 day');
