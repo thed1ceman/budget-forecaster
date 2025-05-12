@@ -35,8 +35,11 @@ $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
 // Debug information
 if ($config['app']['debug']) {
-    error_log("Request URI: " . $request);
+    error_log("=== Routing Debug ===");
+    error_log("Original Request URI: " . $request);
+    error_log("Script Name: " . $_SERVER['SCRIPT_NAME']);
     error_log("Base Path: " . $basePath);
+    error_log("Document Root: " . $_SERVER['DOCUMENT_ROOT']);
 }
 
 // Remove base path from request
@@ -45,6 +48,7 @@ $request = substr($request, strlen($basePath));
 // Debug information
 if ($config['app']['debug']) {
     error_log("Processed Request: " . $request);
+    error_log("===================");
 }
 
 // Simple router
