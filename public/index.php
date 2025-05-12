@@ -33,8 +33,19 @@ try {
 $request = $_SERVER['REQUEST_URI'];
 $basePath = dirname($_SERVER['SCRIPT_NAME']);
 
+// Debug information
+if ($config['app']['debug']) {
+    error_log("Request URI: " . $request);
+    error_log("Base Path: " . $basePath);
+}
+
 // Remove base path from request
 $request = substr($request, strlen($basePath));
+
+// Debug information
+if ($config['app']['debug']) {
+    error_log("Processed Request: " . $request);
+}
 
 // Simple router
 switch ($request) {
@@ -55,6 +66,9 @@ switch ($request) {
         require __DIR__ . '/api/auth/logout.php';
         break;
     default:
+        if ($config['app']['debug']) {
+            error_log("404 Not Found: " . $request);
+        }
         http_response_code(404);
         require __DIR__ . '/../src/views/404.php';
         break;
